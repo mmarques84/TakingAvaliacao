@@ -11,6 +11,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
     {
         public string Name { get; set; }
         public decimal UnitPrice { get; set; }
-        
+        public List<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
     }
 }

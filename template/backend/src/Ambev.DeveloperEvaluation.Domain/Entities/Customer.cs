@@ -13,5 +13,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public string Email { get; set; }
         public string City { get; set; }
         public DateTime BirthDate { get; set; }
+
+        public List<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

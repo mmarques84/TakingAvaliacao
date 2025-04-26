@@ -13,7 +13,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public DateTime SaleDate { get; set; }  
         public Guid IdCustomer { get; set; }
         public Customer Customer { get; set; }
-        public List<SaleItem> Items { get; set; } = new List<SaleItem>();
+        public List<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
         public decimal TotalAmount { get; set; }
         public Guid IdBranch { get; set; }
         public Branch Branch { get; set; }

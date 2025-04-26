@@ -12,5 +12,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public string Document { get; set; }
+
+        public List<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

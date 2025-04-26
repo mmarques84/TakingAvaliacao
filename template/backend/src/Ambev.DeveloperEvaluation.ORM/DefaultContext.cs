@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.ORM.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,11 @@ public class DefaultContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new BranchesMappper());
+        modelBuilder.ApplyConfiguration(new CustomerMapper());
+        modelBuilder.ApplyConfiguration(new ProductMapper());
+        modelBuilder.ApplyConfiguration(new SaleItemMapper());
+        modelBuilder.ApplyConfiguration(new SaleMapper());
     }
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
