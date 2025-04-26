@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
-    public class Product:BaseEntity
+    public class Item : BaseEntity
     {
         public string Name { get; set; }
         public decimal UnitPrice { get; set; }

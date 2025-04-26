@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.ORM.Mapping
 {
-    public class ProductMapper : IEntityTypeConfiguration<Product>
+    public class ProductMapper : IEntityTypeConfiguration<Item>
     {
-        public void Configure(EntityTypeBuilder<Product> builder)
+        public void Configure(EntityTypeBuilder<Item> builder)
         {
             builder.ToTable("Products");
 
