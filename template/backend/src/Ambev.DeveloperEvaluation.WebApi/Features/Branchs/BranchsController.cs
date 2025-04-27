@@ -1,12 +1,16 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Exceptions;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Branchs.CreateBranch;
+using Ambev.DeveloperEvaluation.WebApi.Features.Users.CreateUser;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
 {
@@ -16,7 +20,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
     {
         private readonly IBranchService _branchService;
         private readonly IMapper _mapper;
-        // Construtor com injeção de dependência do IBranchService
+  
         public BranchController(IBranchService branchService, IMapper mapper)
         {
             _branchService = branchService;
@@ -29,7 +33,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
         {
             var branch = await _branchService.GetBranchByIdAsync(id);
             if (branch == null)
-                return NotFound("Filial não encontrada.");
+            {
+                var errorResponse = new ErrorResponse(404, "Filial não encontrada.");
+                return NotFound(errorResponse);
+            }          
 
             return Ok(branch);
         }
@@ -44,10 +51,20 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
 
         // POST api/branch
         [HttpPost]
-        public async Task<IActionResult> CreateBranchAsync([FromBody] CreateBranchRequest createBranchRequest)
+        public async Task<IActionResult> CreateBranchAsync([FromBody] CreateBranchRequest createBranchRequest,CancellationToken cancellationToken)
         {
+
+            var validator = new CreateBranchRequestValidator();
+            var validationResult = await validator.ValidateAsync(createBranchRequest, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
             if (createBranchRequest == null)
-                return BadRequest("Dados da filial não fornecidos.");
+            {
+                var errorResponse = new ErrorResponse(400, "Dados da filial não fornecidos.");
+                return BadRequest(errorResponse);
+            }       
 
             try
             {
@@ -66,14 +83,20 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
         public async Task<IActionResult> UpdateBranchAsync(Guid id, string name)
         {
             if (name == null)
-                return BadRequest("Dados da filial não fornecidos.");
+            {
+                var errorResponse = new ErrorResponse(400, "Dados da filial não fornecidos.");
+                return BadRequest(errorResponse);
+            }     
 
             try
             {
                 
                 var updatedBranch =  _branchService.UpdateBranchAsync(id, name);
                 if (updatedBranch == null)
-                    return NotFound("Filial não encontrada.");
+                {
+                    var errorResponse = new ErrorResponse(404, "Filial não encontrada.");
+                    return NotFound(errorResponse);
+                }
 
                 return Ok(updatedBranch);
             }
@@ -91,9 +114,13 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
             {
                 var deleted =  _branchService.DeleteBranchAsync(id);
                 if (deleted !=null)
-                    return NotFound("Filial não encontrada.");
+                {
+                    var errorResponse = new ErrorResponse(404, "Filial não encontrada.");
+                    return NotFound(errorResponse);
+                }
+           
 
-                return NoContent();  // Status 204 para deletar com sucesso sem retornar conteúdo
+                return NoContent();
             }
             catch (Exception ex)
             {

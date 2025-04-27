@@ -12,7 +12,7 @@ namespace Ambev.DeveloperEvaluation.Ports.Interfaces
         Task<Customer> CreateCustomerAsync(Customer customer);
         Task<Customer> GetCustomerByIdAsync(Guid customerId);
         Task<IEnumerable<Customer>> GetAllCustomersAsync();
-        Task UpdateCustomerAsync(Guid customerId, string name, string email);
+        Task UpdateCustomerAsync(Customer customer);
         Task DeleteCustomerAsync(Guid customerId);
     }
 }

@@ -44,13 +44,15 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
             return await _customerRepository.GetAllAsync();
         }
 
-        public async Task UpdateCustomerAsync(Guid customerId, string name, string email)
+        public async Task UpdateCustomerAsync(Customer customers)
         {
-            var customer = await _customerRepository.GetByIdAsync(customerId);
+            var customer = await _customerRepository.GetByIdAsync(customers.Id);
             if (customer != null)
             {
-                customer.Name = name;
-                customer.Email = email;
+                customer.Name = customers.Name;
+                customer.Email = customers.Email;
+                customer.City = customers.City;
+                customer.BirthDate = customers.BirthDate;
                 await _customerRepository.UpdateAsync(customer);
             }
         }

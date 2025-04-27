@@ -1,5 +1,6 @@
 ﻿
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Exceptions;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
 using AutoMapper;
@@ -19,98 +20,112 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Product
             _mapper = mapper;
         }
 
-        // Endpoint para listar todos os produtos
+  
         [HttpGet]
         public async Task<IActionResult> GetAllProductsAsync()
         {
             try
             {
                 var products = await _productService.GetAllProductsAsync();
-                return Ok(products); // Retorna todos os produtos com código 200
+                return Ok(products);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Retorna erro caso ocorra um problema
+                return BadRequest(ex.Message);
             }
         }
-
-        // Endpoint para obter um produto específico por ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductByIdAsync(Guid id)
         {
             try
             {
                 var product = await _productService.GetProductByIdAsync(id);
+
                 if (product == null)
                 {
-                    return NotFound("Produto não encontrado."); // Retorna 404 se o produto não existir
+                    var errorResponse = new ErrorResponse(404, "Produto não encontrado.");
+                    return NotFound(errorResponse);
                 }
-                return Ok(product); // Retorna o produto encontrado com código 200
+
+                var productResponse = _mapper.Map<CreateProductResponse>(product);
+                return Ok(productResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Retorna erro caso ocorra um problema
+                return BadRequest(ex.Message);
             }
         }
 
-        // Endpoint para criar um novo produto
+
         [HttpPost]
         public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductRequest createProductRequest)
         {
             if (createProductRequest == null)
-                return BadRequest("Dados do produto não fornecidos.");
+            {
+                var errorResponse = new ErrorResponse(400, "Dados do produto não fornecidos.");
+                return BadRequest(errorResponse);
+            }
 
             try
             {
-             
+
                 var ProdMapper = _mapper.Map<Item>(createProductRequest);
                 var createdProduct = await _productService.CreateProductAsync(ProdMapper);
-                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = createdProduct.Id }, createdProduct);
-                // Retorna 201 com o recurso criado e o local para obter esse recurso
+                return CreatedAtAction(nameof(CreateProductResponse), new { id = createdProduct.Id }, createdProduct);
+
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Retorna erro caso ocorra um problema
+                return BadRequest(ex.Message);
             }
         }
 
-        // Endpoint para atualizar um produto existente
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] CreateProductRequest updateProductRequest)
         {
             if (updateProductRequest == null)
-                return BadRequest("Dados do produto não fornecidos.");
+            {
+                var errorResponse = new ErrorResponse(400, "Dados do produto não fornecidos.");
+                return BadRequest(errorResponse);
+            }
+
 
             try
             {
-          
-                var updatedProduct =  _productService.UpdateProductAsync(id, updateProductRequest.Name, updateProductRequest.UnitPrice);
-                if (updatedProduct == null)
-                    return NotFound("Produto não encontrado.");
 
-                return Ok(updatedProduct); // Retorna o produto atualizado
+                var updatedProduct = _productService.UpdateProductAsync(id, updateProductRequest.Name, updateProductRequest.UnitPrice);
+                if (updatedProduct == null)
+                {
+                    var errorResponse = new ErrorResponse(404, "Produto não encontrado.");
+                    return NotFound(errorResponse);
+                }
+
+
+                return Ok(updatedProduct);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Retorna erro caso ocorra um problema
+                return BadRequest(ex.Message);
             }
         }
 
-        // Endpoint para excluir um produto
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductAsync(Guid id)
         {
             try
             {
                 var deleted = _productService.DeleteProductAsync(id);
-                if (deleted !=null)
-                    return NotFound("Produto não encontrado.");
-
-                return NoContent(); // Retorna 204 sem conteúdo, indicando que a exclusão foi bem-sucedida
+                if (deleted != null)
+                {
+                    var errorResponse = new ErrorResponse(404, "Produto não encontrado.");
+                    return NotFound(errorResponse);
+                }
+                
+                return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Retorna erro caso ocorra um problema
+                return BadRequest(ex.Message);
             }
         }
     }

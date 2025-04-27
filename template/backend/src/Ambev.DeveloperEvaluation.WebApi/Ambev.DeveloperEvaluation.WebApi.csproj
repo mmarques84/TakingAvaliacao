@@ -33,6 +33,8 @@
 		<ProjectReference Include="..\Ambev.DeveloperEvaluation.ORM\Ambev.DeveloperEvaluation.ORM.csproj" />
 	</ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\Branchs\GetBranch\" />
+    <Folder Include="Features\Branchs\UpdateBranch\" />
     <Folder Include="Features\Users\GetUser\" />
     <Folder Include="Features\Users\DeleteUser\" />
     <Folder Include="Features\Users\ListUsers\" />

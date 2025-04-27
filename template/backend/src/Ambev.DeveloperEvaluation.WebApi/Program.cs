@@ -10,6 +10,7 @@ using Ambev.DeveloperEvaluation.ORM.Mapping;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using Ambev.DeveloperEvaluation.Ports.Services;
+using Ambev.DeveloperEvaluation.WebApi.Mappings;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
@@ -46,7 +47,9 @@ public class Program
             builder.Services.AddAutoMapper(typeof(BranchesMappper));
             builder.Services.AddAutoMapper(typeof(ProductMapper));
             builder.Services.AddAutoMapper(typeof(SaleItemMapper));
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            //--
             builder.Services.AddScoped<ISaleService, SaleService>();
             builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
