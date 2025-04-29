@@ -22,11 +22,11 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
         {
             var _branch = new Branch
             {
-                Name = branch.Name,
-                Active = true,  
+                Name = branch.Name, 
                 Description = branch.Description,
-                CreatedAt = DateTime.Now,
-                Document =branch.Document,   
+                Document =branch.Document,
+                CreatedAt = DateTime.UtcNow,
+                Active = true,
             };
 
             await _branchRepository.AddAsync(_branch);

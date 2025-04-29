@@ -4,9 +4,11 @@ using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.ORM.Mapping;
+using Ambev.DeveloperEvaluation.ORM.Messaging.RabbitMQ;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using Ambev.DeveloperEvaluation.Ports.Services;
@@ -25,6 +27,7 @@ public class Program
     {
         try
         {
+
             Log.Information("Starting web application");
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -48,6 +51,15 @@ public class Program
             builder.Services.AddAutoMapper(typeof(ProductMapper));
             builder.Services.AddAutoMapper(typeof(SaleItemMapper));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            builder.Services.AddScoped<IEnvioEmailService, EnvioEmailService>();
+
+            //builder.Services.AddSingleton<VendaCriadaEventConsumer>();
+            builder.Services.AddSingleton<VendaEventsPublisher>();
+            builder.Services.AddSingleton<VendaCriadaEventConsumer>();
+            builder.Services.AddSingleton<VendaModificadaEventConsumer>();
+            builder.Services.AddSingleton<VendaCanceladaEventConsumer>();
+            builder.Services.AddSingleton<ItemCanceladoEventConsumer>();
 
             //--
             builder.Services.AddScoped<ISaleService, SaleService>();
@@ -83,7 +95,25 @@ public class Program
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+
+
             var app = builder.Build();
+        
+            // Controle de cancelamento de eventos
+            var cancellationTokenSource = new CancellationTokenSource();
+
+     
+            var vendaCriadaConsumer = app.Services.GetRequiredService<VendaCriadaEventConsumer>();
+            var vendaModificadaConsumer = app.Services.GetRequiredService<VendaModificadaEventConsumer>();
+            var vendaCanceladaConsumer = app.Services.GetRequiredService<VendaCanceladaEventConsumer>();
+            var itemCanceladoConsumer = app.Services.GetRequiredService<ItemCanceladoEventConsumer>();
+
+            // Inicia os consumidores
+            vendaCriadaConsumer.StartConsuming();
+            vendaModificadaConsumer.StartConsuming();
+            vendaCanceladaConsumer.StartConsuming();
+            itemCanceladoConsumer.StartConsuming();
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())

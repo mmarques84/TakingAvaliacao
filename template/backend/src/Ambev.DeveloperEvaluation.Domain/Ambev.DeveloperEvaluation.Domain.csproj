@@ -7,12 +7,14 @@
 
   <ItemGroup>
     <Folder Include="Enums\" />
-    <Folder Include="Events\" />
     <Folder Include="ValueObjects\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.10.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
+    <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 
   <ItemGroup>

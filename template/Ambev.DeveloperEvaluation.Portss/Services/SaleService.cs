@@ -1,9 +1,12 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.ORM.Mapping;
+using Ambev.DeveloperEvaluation.ORM.Messaging.RabbitMQ;
 using Ambev.DeveloperEvaluation.Ports.DTOs;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,86 +22,107 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
         private readonly IBranchRepository _branchRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
+        private readonly VendaEventsPublisher _vendaEventsPublisher;
+
         public SaleService(ISaleRepository saleRepository, IProductRepository productRepository,
-                           IBranchRepository branchRepository, ICustomerRepository customerRepository)
+                           IBranchRepository branchRepository, ICustomerRepository customerRepository, VendaEventsPublisher vendaEventsPublisher)
         {
             _saleRepository = saleRepository;
             _productRepository = productRepository;
             _branchRepository = branchRepository;
             _customerRepository = customerRepository;
+            _vendaEventsPublisher = vendaEventsPublisher;
         }
 
-        public async Task<Sale> CreateSaleAsync(SaleDto sale)
+        public async Task<Sale> CreateSaleAsync(Sale sale)
         {
 
-            var customer = await _customerRepository.GetByIdAsync(sale.CustomerId);
+            var customer = await _customerRepository.GetByIdAsync(sale.IdCustomer);
             if (customer == null)
                 throw new Exception("Cliente não encontrado.");
 
-
-            var branch = await _branchRepository.GetByIdAsync(sale.BranchId);
+            var branch = await _branchRepository.GetByIdAsync(sale.IdBranch);
             if (branch == null)
                 throw new Exception("Filial não encontrada.");
 
-
-            if (sale.Items == null || !sale.Items.Any())
+            if (sale.SaleItems == null || !sale.SaleItems.Any())
                 throw new Exception("A venda precisa ter pelo menos um item.");
-         
+
             decimal totalAmount = 0;
-            foreach (var item in sale.Items)
+            var processedItems = new List<SaleItem>();
+
+            foreach (var item in sale.SaleItems)
             {
- 
                 var product = await _productRepository.GetByIdAsync(item.ProductId);
                 if (product == null)
                     throw new Exception($"Produto com ID {item.ProductId} não encontrado.");
 
-
-                var saleItem = new SaleItemDto
+                var saleItem = new SaleItem
                 {
-                    ProductId = product.Id,  
+                    ProductId = product.Id,
                     Quantity = item.Quantity,
                     UnitPrice = item.UnitPrice,
-                    Discount = item.Discount
+                 
+                    
                 };
 
+                // Regras de negócio
                 if (saleItem.Quantity < 4)
                 {
-                    saleItem.Discount = 0; // Sem desconto para quantidades abaixo de 4
+                    saleItem.Discount = 0;
+                    //("A quantidade mínima para obter desconto é 4 itens");
                 }
-                else if (saleItem.Quantity >= 4 && saleItem.Quantity <= 9)
-                {
-                    saleItem.Discount = 0.10m; // 10% de desconto para 4 a 9 itens
-                }
-                else if (saleItem.Quantity >= 10 && saleItem.Quantity <= 20)
-                {
-                    saleItem.Discount = 0.20m; // 20% de desconto para 10 a 20 itens
-                }
-                else
+                else if (saleItem.Quantity > 20)
                 {
                     throw new Exception("Não é permitido vender mais de 20 unidades de um produto.");
+                }
+                else if (saleItem.Quantity <= 9)
+                {
+                    saleItem.Discount = 0.10m;
+                }
+                else // de 10 a 20
+                {
+                    saleItem.Discount = 0.20m;
                 }
 
                 saleItem.TotalAmount = saleItem.Quantity * saleItem.UnitPrice * (1 - saleItem.Discount);
                 totalAmount += saleItem.TotalAmount;
 
-                // Adicionar o item da venda à venda
-                sale.Items.Add(saleItem);
+                processedItems.Add(saleItem);
             }
 
+            sale.SaleItems = processedItems;
             sale.TotalAmount = totalAmount;
-            sale.SaleDate = DateTime.Now; // Definir a data da venda
-            var salemap = _mapper.Map<Sale>(sale);
-            // Salvar a venda no repositório
-            await _saleRepository.AddAsync(salemap);
+            sale.SaleDate = DateTime.UtcNow;
 
-            // Retornar a venda criada
-            return salemap;
+            //var salemap = _mapper.Map<Sale>(sale);
+
+            try
+            {
+                await _saleRepository.AddAsync(sale);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                if (ex.InnerException != null)
+                    Console.WriteLine("Inner: " + ex.InnerException.Message);
+            }
+
+            var vendaCriadaEvent = new VendaCriadaEvent
+            {
+                SaleId = sale.Id,
+                CustomerId = sale.IdCustomer,
+                CustomerEmail = customer.Email,
+                SaleDate = sale.SaleDate,
+                TotalAmount = sale.TotalAmount
+            };
+
+            _vendaEventsPublisher.PublishVendaCriadaEvent(vendaCriadaEvent);
+
+            return sale;
         }
 
-        private decimal CalculateItemTotal(SaleItem item)
-        {
-            return item.Quantity * item.UnitPrice * (1 - item.Discount);
-        }
+      
         public async Task<Sale> GetSaleByIdAsync(Guid saleId)
         {
             return await _saleRepository.GetByIdAsync(saleId);
@@ -123,7 +147,45 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
             }
         }
 
-       
+
+        public async Task<Sale> UpdateAsync(Guid saleId, Sale sale)
+        {
+            var existingSale = await _saleRepository.GetByIdAsync(saleId);
+            if (existingSale == null)
+            {
+                throw new Exception("Venda não encontrada.");
+            }
+            existingSale.IdCustomer = sale.IdCustomer;
+            existingSale.IdBranch = sale.IdBranch;
+            existingSale.SaleDate = sale.SaleDate;
+            existingSale.TotalAmount = sale.TotalAmount;
+            existingSale.SaleItems = sale.SaleItems;
+
+            await _saleRepository.UpdateAsync(existingSale);
+            return existingSale;
+
+        }
+
+        public async Task<bool> DeleteAsync(Guid saleId)
+        {
+            try
+            {
+                var sale = await _saleRepository.GetByIdAsync(saleId);
+                if (sale == null)
+                {
+                    return false;
+                }
+
+                await _saleRepository.DeleteAsync(sale.Id);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
+
+
 

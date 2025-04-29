@@ -21,5 +21,5 @@ public class BaseEntity : IComparable<BaseEntity>
         return other!.Id.CompareTo(Id);
     }
     public virtual bool Active { get; set; } = true;
-    public virtual DateTime? CreatedAt { get; set; } = DateTime.Now;
+    public virtual DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -21,8 +21,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(si => si.Quantity).IsRequired().HasColumnType("integer");
             builder.Property(si => si.UnitPrice).IsRequired().HasColumnType("numeric");
             builder.Property(si => si.Discount).IsRequired().HasColumnType("numeric");
-            builder.Property(si => si.Active).IsRequired();
-            builder.Property(si => si.CreatedAt).HasColumnType("timestamp with time zone");
+
 
             // Relacionamento com Sales
             builder.HasOne(si => si.Sale)

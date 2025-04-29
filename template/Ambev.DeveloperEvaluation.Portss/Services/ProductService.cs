@@ -18,12 +18,15 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
             _productRepository = productRepository;
         }
 
-        public async Task<Item> CreateProductAsync(string name, decimal price)
+        public async Task<Item> CreateProductAsync(Item item)
         {
             var product = new Item
             {
-                Name = name,
-                UnitPrice = price
+                Name = item.Name,
+                UnitPrice = item.UnitPrice,
+                Active=true,
+                CreatedAt = DateTime.UtcNow,
+
             };
 
             await _productRepository.AddAsync(product);
@@ -60,9 +63,6 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
             }
         }
 
-        public Task<Item> CreateProductAsync(Item product)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

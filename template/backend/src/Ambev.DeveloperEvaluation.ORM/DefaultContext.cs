@@ -29,6 +29,9 @@ public class DefaultContext : DbContext
         modelBuilder.ApplyConfiguration(new ProductMapper());
         modelBuilder.ApplyConfiguration(new SaleItemMapper());
         modelBuilder.ApplyConfiguration(new SaleMapper());
+        modelBuilder.Entity<Sale>()
+       .Property(s => s.SaleNumber)
+       .HasDefaultValueSql("nextval('public.\"SaleNumberSequence\"')");
     }
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
