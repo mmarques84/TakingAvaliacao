@@ -1,9 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.ORM.Mapping;
 using Ambev.DeveloperEvaluation.ORM.Messaging.RabbitMQ;
-using Ambev.DeveloperEvaluation.Ports.DTOs;
 using Ambev.DeveloperEvaluation.Ports.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -61,16 +59,16 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
                 {
                     ProductId = product.Id,
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice,
+                    UnitPrice = product.UnitPrice,
                  
                     
                 };
 
                 // Regras de negócio
-                if (saleItem.Quantity < 4)
+                if (saleItem.Quantity < 4)//("A quantidade mínima para obter desconto é 4 itens");
                 {
                     saleItem.Discount = 0;
-                    //("A quantidade mínima para obter desconto é 4 itens");
+                    
                 }
                 else if (saleItem.Quantity > 20)
                 {
@@ -95,7 +93,6 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
             sale.TotalAmount = totalAmount;
             sale.SaleDate = DateTime.UtcNow;
 
-            //var salemap = _mapper.Map<Sale>(sale);
 
             try
             {
@@ -107,7 +104,7 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
                 if (ex.InnerException != null)
                     Console.WriteLine("Inner: " + ex.InnerException.Message);
             }
-
+            //enviar para mensageria 
             var vendaCriadaEvent = new VendaCriadaEvent
             {
                 SaleId = sale.Id,

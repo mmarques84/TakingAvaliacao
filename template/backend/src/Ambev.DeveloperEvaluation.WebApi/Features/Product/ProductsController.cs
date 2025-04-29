@@ -47,7 +47,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Product
                     return NotFound(errorResponse);
                 }
 
-                var productResponse = _mapper.Map<CreateProductResponse>(product);
+                var productResponse = _mapper.Map<Item>(product);
                 return Ok(productResponse);
             }
             catch (Exception ex)

@@ -69,8 +69,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Branchs
             try
             {
                 var branchmapper = _mapper.Map<Branch>(createBranchRequest);
-                var branch = await _branchService.CreateBranchAsync(branchmapper);
-                return CreatedAtAction(nameof(GetBranchByIdAsync), new { id = branch.Id }, branch);
+                var branch = await _branchService.CreateBranchAsync(branchmapper);          
+                return Ok(branch);
             }
             catch (Exception ex)
             {

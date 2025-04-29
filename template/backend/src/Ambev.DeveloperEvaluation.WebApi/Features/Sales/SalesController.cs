@@ -34,9 +34,17 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 
             try
             {
-                var SaleMapper = _mapper.Map<Sale>(createSaleRequest);
+                //var SaleMapper = _mapper.Map<Sale>(createSaleRequest);
+                var SaleMapper = new Sale
+                {
+                    IdCustomer = createSaleRequest.IdCustomer,
+                    IdBranch = createSaleRequest.IdBranch,
+                    SaleDate = createSaleRequest.SaleDate,
+                    IsCancelled = createSaleRequest.IsCancelled,
+                    SaleItems = _mapper.Map<List<SaleItem>>(createSaleRequest.SaleItems)
+                };
                 var sale = await _saleService.CreateSaleAsync(SaleMapper);
-                return Ok(sale.SaleNumber);
+                return Ok(sale);
             }
             catch (Exception ex)
             {
@@ -56,8 +64,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
                     var errorResponse = new ErrorResponse(404, "Venda não encontrada.");
                     return NotFound(errorResponse);
                 }
-
-                return Ok(sale);
+                var resultMap = _mapper.Map<CreateSaleResponse>(sale);
+                return Ok(resultMap);
             }
             catch (Exception ex)
             {

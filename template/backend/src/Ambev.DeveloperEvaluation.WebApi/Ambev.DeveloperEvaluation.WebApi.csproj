@@ -26,12 +26,13 @@
 	  </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Ambev.DeveloperEvaluation.Portss\Ambev.DeveloperEvaluation.Ports.csproj" />
+  <ItemGroup>   
+    
     <ProjectReference Include="..\Ambev.DeveloperEvaluation.IoC\Ambev.DeveloperEvaluation.IoC.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Ambev.DeveloperEvaluation.ORM\Ambev.DeveloperEvaluation.ORM.csproj" />
+		<ProjectReference Include="..\Ambev.DeveloperEvaluation.Ports\Ambev.DeveloperEvaluation.Ports.csproj" />
 	</ItemGroup>
   <ItemGroup>
     <Folder Include="Features\Branchs\GetBranch\" />

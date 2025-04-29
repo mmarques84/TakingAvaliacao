@@ -13,6 +13,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Mappings
     {
         public MappingProfile()
         {
+            // Mapeamentos básicos
             CreateMap<CreateBranchRequest, Branch>();
             CreateMap<Branch, CreateBranchResponse>();
 
@@ -20,11 +21,30 @@ namespace Ambev.DeveloperEvaluation.WebApi.Mappings
             CreateMap<Customer, CreateCustomerResponse>();
 
             CreateMap<CreateProductRequest, Item>();
-            //CreateMap<Item, ProductResponse>();
+            CreateMap<Item, CreateProductResponse>();
 
-            CreateMap<CreateSaleRequest, Sale>();
-            CreateMap<CreateSaleItemRequest, SaleItem>();
-            //CreateMap<Sale, SaleResponse>();
+            // Mapeamento de itens da venda
+            CreateMap<CreateSaleItemRequest, SaleItem>()
+                .ForMember(dest => dest.TotalAmount, opt => opt.Ignore()) // será calculado no serviço
+                .ForMember(dest => dest.Sale, opt => opt.Ignore())        // evitar ciclos
+                .ForMember(dest => dest.SaleId, opt => opt.Ignore());     // setado depois
+
+            // Mapeamento da venda
+            CreateMap<CreateSaleRequest, Sale>()
+                .ForMember(dest => dest.TotalAmount, opt => opt.Ignore()) // calculado no serviço
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.SaleItems));
+
+            // Resposta de venda
+            CreateMap<Sale, CreateSaleResponse>();
+
+            CreateMap<Sale, CreateSaleResponse>()
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.SaleItems));
+            CreateMap<CreateSaleRequest, Sale>()
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.SaleItems));
+            CreateMap<SaleItem, CreateSaleItemResponse>();
+
+            CreateMap<Sale, CreateSaleResponse>()
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.SaleItems));
         }
     }
 }
