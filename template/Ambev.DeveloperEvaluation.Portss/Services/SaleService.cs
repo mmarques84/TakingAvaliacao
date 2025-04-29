@@ -80,7 +80,7 @@ namespace Ambev.DeveloperEvaluation.Ports.Services
                 {
                     saleItem.Discount = 0.10m;
                 }
-                else // de 10 a 20
+                else if (saleItem.Quantity >= 10 || saleItem.Quantity <= 20)// de 10 a 20
                 {
                     saleItem.Discount = 0.20m;
                 }
