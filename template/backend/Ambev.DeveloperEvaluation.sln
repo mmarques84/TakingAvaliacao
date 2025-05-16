@@ -58,7 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{26
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ports", "Ports", "{9A9A4009-1B27-4F3C-A234-7E20DD9ED6FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambev.DeveloperEvaluation.Ports", "..\Ambev.DeveloperEvaluation.Portss\Ambev.DeveloperEvaluation.Ports.csproj", "{13B51A2C-BA8C-4298-9666-FC688A5436DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambev.DeveloperEvaluation.Ports", "src\Ambev.DeveloperEvaluation.Ports\Ambev.DeveloperEvaluation.Ports.csproj", "{57129DEC-CDD7-440E-B43F-05A0359813E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,10 +106,10 @@ Global
 		{4AF79501-F785-4B98-8EE5-54BE186D67A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AF79501-F785-4B98-8EE5-54BE186D67A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF79501-F785-4B98-8EE5-54BE186D67A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13B51A2C-BA8C-4298-9666-FC688A5436DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13B51A2C-BA8C-4298-9666-FC688A5436DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13B51A2C-BA8C-4298-9666-FC688A5436DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13B51A2C-BA8C-4298-9666-FC688A5436DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57129DEC-CDD7-440E-B43F-05A0359813E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57129DEC-CDD7-440E-B43F-05A0359813E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57129DEC-CDD7-440E-B43F-05A0359813E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57129DEC-CDD7-440E-B43F-05A0359813E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,7 +135,7 @@ Global
 		{2B484022-3EF7-4BAB-ADB8-849F9E419EDD} = {C8926C5D-2F67-4F90-982B-FFB45F517D65}
 		{267FAAD4-3F48-4B65-9A4E-46A949443F5B} = {D2B590AD-CC11-4062-A3C3-0718E17D651C}
 		{9A9A4009-1B27-4F3C-A234-7E20DD9ED6FD} = {D2B590AD-CC11-4062-A3C3-0718E17D651C}
-		{13B51A2C-BA8C-4298-9666-FC688A5436DC} = {9A9A4009-1B27-4F3C-A234-7E20DD9ED6FD}
+		{57129DEC-CDD7-440E-B43F-05A0359813E5} = {9A9A4009-1B27-4F3C-A234-7E20DD9ED6FD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13EAB81A-C6B2-4C22-B4DE-C6603FC445B6}

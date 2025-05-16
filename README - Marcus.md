@@ -46,6 +46,14 @@ Este projeto foi feito com a **Arquitetura Hexagonal (Ports and Adapters)**:
 git clone https://github.com/mmarques84/TakingAvaliacao.git
 cd seu-repo
 docker-compose -f docker-compose-Marcus.yml up -d
+executar no cmd
+TakingAvaliacao-git\template\backend>docker-compose up --build -d
+resultado 
+[+] Running 4/4
+ ✔ Container ambev_developer_evaluation_cache     Started                                                                                      2.9s
+ ✔ Container ambev_developer_evaluation_nosql     Started                                                                                      2.3s
+ ✔ Container ambev_developer_evaluation_webapi    Started                                                                                      2.9s
+ ✔ Container ambev_developer_evaluation_database  Started  
 
 ##Caso queria testar sem o docker compose
 docker pull rabbitmq:management
